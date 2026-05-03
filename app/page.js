@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 
+
 const C = {
   deep:    '#12082E',
   purple:  '#7B2FFF',
