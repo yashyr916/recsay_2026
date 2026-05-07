@@ -111,7 +111,11 @@ export default function EmployerDashboard() {
 
       {/* NAV */}
       <div style={{ background:'#12082E', padding:'18px 40px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, color:'white' }}>RecSay</span>
+        <div style={{ display:'flex', alignItems:'center', gap:28 }}>
+  <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, color:'white' }}>RecSay</span>
+  <a href="/employer" style={{ fontSize:13, color: 'rgba(192,132,252,0.8)', textDecoration:'none', fontWeight:500 }}>Post JD</a>
+  <a href="/employer/candidates" style={{ fontSize:13, color:'rgba(192,132,252,0.8)', textDecoration:'none', fontWeight:500 }}>Candidates</a>
+</div>
         <div style={{ display:'flex', alignItems:'center', gap:20 }}>
           <span style={{ fontSize:13, color:'rgba(192,132,252,0.8)' }}>{user.email}</span>
           <button onClick={logout} style={{ background:'transparent', border:'1px solid rgba(192,132,252,0.3)', color:'#C084FC', padding:'8px 18px', borderRadius:6, cursor:'pointer', fontSize:13, fontFamily:"'DM Sans',sans-serif" }}>

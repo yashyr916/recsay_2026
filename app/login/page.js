@@ -13,8 +13,14 @@ export default function Login() {
     setLoading(true);
     setError('');
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setError(error.message);
-    else window.location.href = '/dashboard';
+    if (error) {
+  setError(error.message);
+} else {
+  const { data: userData } = await supabase.auth.getUser();
+  const role = userData.user?.user_metadata?.role;
+  if (role === 'recruiter') window.location.href = '/recruiter';
+  else window.location.href = '/employer';
+}
     setLoading(false);
   };
 

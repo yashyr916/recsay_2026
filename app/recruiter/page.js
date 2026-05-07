@@ -79,7 +79,10 @@ export default function RecruiterDashboard() {
 
       {/* NAV */}
       <div style={{ background:'#12082E', padding:'18px 40px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-        <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, color:'white' }}>RecSay</span>
+        <div style={{ display:'flex', alignItems:'center', gap:28 }}>
+  <span style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, color:'white' }}>RecSay</span>
+  <a href="/recruiter" style={{ fontSize:13, color:'rgba(192,132,252,0.8)', textDecoration:'none', fontWeight:500 }}>Clusters</a>
+</div>
         <div style={{ display:'flex', alignItems:'center', gap:20 }}>
           <span style={{ fontSize:13, color:'rgba(192,132,252,0.8)' }}>{user.email}</span>
           <span style={{ fontSize:11, background:'rgba(123,47,255,0.3)', color:'#C084FC', padding:'4px 10px', borderRadius:99, fontWeight:600 }}>RECRUITER</span>

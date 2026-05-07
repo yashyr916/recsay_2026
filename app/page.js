@@ -96,7 +96,7 @@ function Sidebar({ open, onClose }) {
 
       <nav className="sidebar-nav">
         {navItems.map(([id, label]) => (
-          <a key={id} href={`#${id}`} className={`nav-item${active===id?' active':''}`} onClick={onClose}>
+          <a key={id} href={"/login"} className={`nav-item${active===id?' active':''}`} onClick={onClose}>
             <span className="nav-line" />{label}
           </a>
         ))}
@@ -116,7 +116,7 @@ function Sidebar({ open, onClose }) {
           </svg>
           recsay.com
         </div>
-        <a href="#summary" className="btn-access">Request Early Access</a>
+        <a href="/register" className="btn-access">Request Early Access</a>
         <div className="live-badge">
           <span className="live-dot" />
           Now accepting signups
@@ -368,7 +368,7 @@ function ProjectsSection() {
               <ul className="proj-features">
                 {p.features.map(f => <li key={f}><span>✓</span>{f}</li>)}
               </ul>
-              <a href="#summary" className={`proj-btn${p.solid?' solid':''}`}>{p.cta}</a>
+              <a href="/register" className={`proj-btn${p.solid?' solid':''}`}>{p.cta}</a>
             </div>
           </div>
         ))}
