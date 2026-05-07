@@ -1,6 +1,5 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
-  "/api/extract-keywords/route": "app/api/extract-keywords/route.js",
-  "/employer/page": "app/employer/page.js",
-  "/api/cluster-jobs/route": "app/api/cluster-jobs/route.js"
+  "/recruiter/page": "app/recruiter/page.js"
 }
