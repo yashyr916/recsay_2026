@@ -11,10 +11,10 @@
       "static/css/app/layout.css",
       "static/chunks/app/layout.js"
     ],
-    "/employer/page": [
+    "/employer/candidates/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/employer/page.js"
+      "static/chunks/app/employer/candidates/page.js"
     ],
     "/recruiter/page": [
       "static/chunks/webpack.js",
