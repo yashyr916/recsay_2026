@@ -1,5 +1,6 @@
 {
   "/page": "app/page.js",
+  "/api/extract-keywords/route": "app/api/extract-keywords/route.js",
   "/employer/page": "app/employer/page.js",
-  "/dashboard/page": "app/dashboard/page.js"
+  "/api/cluster-jobs/route": "app/api/cluster-jobs/route.js"
 }

@@ -34,28 +34,54 @@ export default function EmployerDashboard() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setSuccess(false);
+  e.preventDefault();
+  setLoading(true);
+  setSuccess(false);
 
-    const { error } = await supabase.from('jobs').insert([{
-      title:        form.title,
-      company_name: form.company_name,
-      type:         form.type,
-      description:  form.description,
-      user_id:      user.id,
-      keywords:     [],
-      status:       'active',
-    }]);
+  try {
+    // Step 1 — extract keywords
+    const res = await fetch('/api/extract-keywords', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ description: form.description }),
+    });
+    const data = await res.json();
+    const keywords = data.keywords || [];
 
-    if (!error) {
-      setSuccess(true);
-      setForm({ title:'', company_name:'', type:'tech', description:'' });
-      fetchJobs(user.id);
-    }
-    setLoading(false);
-  };
+    // Step 2 — save JD to Supabase
+    const { data: insertedJob, error } = await supabase
+      .from('jobs')
+      .insert([{
+        title:        form.title,
+        company_name: form.company_name,
+        type:         form.type,
+        description:  form.description,
+        user_id:      user.id,
+        keywords:     keywords,
+        status:       'active',
+      }])
+      .select()
+      .single();
 
+    if (error) throw error;
+
+    // Step 3 — run clustering on the new job
+    await fetch('/api/cluster-jobs', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ job_id: insertedJob.id }),
+    });
+
+    setSuccess(true);
+    setForm({ title:'', company_name:'', type:'tech', description:'' });
+    fetchJobs(user.id);
+
+  } catch (err) {
+    console.error('Error:', err);
+  }
+
+  setLoading(false);
+};
   const logout = async () => {
     await supabase.auth.signOut();
     window.location.href = '/login';
