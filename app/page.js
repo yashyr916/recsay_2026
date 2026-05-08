@@ -369,6 +369,8 @@ function ProjectsSection() {
                 {p.features.map(f => <li key={f}><span>✓</span>{f}</li>)}
               </ul>
               <a href="/register" className={`proj-btn${p.solid?' solid':''}`}>{p.cta}</a>
+              <a href="/recruiter" style={{ fontSize:13, color:'rgba(192,132,252,0.8)', textDecoration:'none', fontWeight:500 }}>Clusters</a>
+<a href="/recruiter/dashboard" style={{ fontSize:13, color:'rgba(192,132,252,0.7)', textDecoration:'none' }}>Dashboard</a>
             </div>
           </div>
         ))}

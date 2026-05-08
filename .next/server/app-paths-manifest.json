@@ -1,5 +1,9 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
+  "/recruiter/page": "app/recruiter/page.js",
+  "/recruiter/dashboard/page": "app/recruiter/dashboard/page.js",
+  "/employer/dashboard/page": "app/employer/dashboard/page.js",
   "/employer/page": "app/employer/page.js",
-  "/recruiter/page": "app/recruiter/page.js"
+  "/employer/candidates/page": "app/employer/candidates/page.js"
 }
