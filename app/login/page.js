@@ -18,8 +18,8 @@ export default function Login() {
 } else {
   const { data: userData } = await supabase.auth.getUser();
   const role = userData.user?.user_metadata?.role;
-  if (role === 'recruiter') window.location.href = '/recruiter';
-  else window.location.href = '/employer';
+  if (role === 'recruiter') window.location.href = '/recruiter/dashboard';
+  else window.location.href = '/employer/dashboard';
 }
     setLoading(false);
   };
