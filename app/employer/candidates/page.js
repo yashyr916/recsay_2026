@@ -40,15 +40,26 @@ export default function EmployerCandidates() {
     setLoading(false);
   };
 
-  const updateStatus = async (candidateId, newStatus) => {
-    await supabase
-      .from('candidates')
-      .update({ status: newStatus })
-      .eq('id', candidateId);
-    // refresh
-    fetchCandidates(selectedJob);
-  };
+  const updateStatus = async (candidateId, newStatus, clusterId) => {
+  await supabase
+    .from('candidates')
+    .update({ status: newStatus })
+    .eq('id', candidateId);
 
+  // if rejected → trigger pipeline shift
+  if (newStatus === 'rejected') {
+    await fetch('/api/pipeline-shift', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        candidate_id: candidateId,
+        current_cluster_id: clusterId,
+      }),
+    });
+  }
+
+  fetchCandidates(selectedJob);
+};
   const logout = async () => {
     await supabase.auth.signOut();
     window.location.href = '/login';
@@ -214,17 +225,17 @@ export default function EmployerCandidates() {
 
                             {/* Actions */}
                             <div style={{ display:'flex', gap:8 }}>
-                              <button onClick={() => updateStatus(c.id, 'shortlisted')}
+                              <button onClick={() => updateStatus(c.id, 'shortlisted',c.cluster_id)}
                                 disabled={c.status === 'shortlisted'}
                                 style={{ flex:1, padding:'9px', borderRadius:7, border:'1.5px solid #86EFAC', background: c.status==='shortlisted' ? '#F0FDF4' : 'transparent', color:'#166534', fontSize:12, fontWeight:600, cursor: c.status==='shortlisted' ? 'default' : 'pointer', fontFamily:"'DM Sans',sans-serif", transition:'all 0.2s' }}>
                                 {c.status === 'shortlisted' ? '✓ Shortlisted' : 'Shortlist'}
                               </button>
-                              <button onClick={() => updateStatus(c.id, 'hired')}
+                              <button onClick={() => updateStatus(c.id, 'hired',c.cluster_id)}
                                 disabled={c.status === 'hired'}
                                 style={{ flex:1, padding:'9px', borderRadius:7, border:'1.5px solid #FED7AA', background: c.status==='hired' ? '#FFF7ED' : 'transparent', color:'#C2410C', fontSize:12, fontWeight:600, cursor: c.status==='hired' ? 'default' : 'pointer', fontFamily:"'DM Sans',sans-serif", transition:'all 0.2s' }}>
                                 {c.status === 'hired' ? '✓ Hired' : 'Mark Hired'}
                               </button>
-                              <button onClick={() => updateStatus(c.id, 'rejected')}
+                              <button onClick={() => updateStatus(c.id, 'rejected',c.cluster_id)}
                                 disabled={c.status === 'rejected'}
                                 style={{ flex:1, padding:'9px', borderRadius:7, border:'1.5px solid #FCA5A5', background: c.status==='rejected' ? '#FEF2F2' : 'transparent', color:'#DC2626', fontSize:12, fontWeight:600, cursor: c.status==='rejected' ? 'default' : 'pointer', fontFamily:"'DM Sans',sans-serif", transition:'all 0.2s' }}>
                                 {c.status === 'rejected' ? '✗ Rejected' : 'Reject'}
