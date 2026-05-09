@@ -83,7 +83,7 @@ export default function Home() {
         transition: 'all 0.3s ease',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 52, height: 52, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(123,47,255,0.6))' }} onError={e => { e.target.style.display='none'; }} />
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 70, height: 70, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(123,47,255,0.6))' }} onError={e => { e.target.style.display='none'; }} />
           <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>RecSay</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>

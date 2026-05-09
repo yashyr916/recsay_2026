@@ -610,6 +610,55 @@ body {
 /* ══════════════════════════════════════
    RESPONSIVE
 ══════════════════════════════════════ */
+@media (max-width: 768px) {
+  .hero-grid { grid-template-columns: 1fr !important; }
+  .demo-col { display: none !important; }
+  .steps-grid { grid-template-columns: 1fr !important; }
+  .feat-grid { grid-template-columns: 1fr !important; }
+  .plans-grid { grid-template-columns: 1fr !important; }
+  .testi-grid { grid-template-columns: 1fr !important; }
+
+  /* Nav fix */
+  nav {
+    padding: 0 16px !important;
+    height: 56px !important;
+  }
+  nav > div:nth-child(2) { display: none !important; }
+  nav > div:nth-child(3) .btn-ghost { display: none !important; }
+  nav > div:nth-child(3) .btn-primary {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+
+  /* Logo fix */
+  nav img { width: 32px !important; height: 32px !important; }
+  nav span { font-size: 17px !important; }
+
+  /* For who fix */
+  .hero-section { padding: 90px 20px 60px !important; }
+  .section-pad { padding: 70px 20px !important; }
+
+  /* Two col → one col */
+  div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stats band */
+  div[style*="grid-template-columns: repeat(4, 1fr)"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Bottom CTA */
+  div[style*="padding: '80px 60px'"] {
+    padding: 40px 24px !important;
+  }
+
+  .footer-grid {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 16px !important;
+  }
+}
 @media (max-width: 900px) {
   .sidebar {
     transform: translateX(-100%);
