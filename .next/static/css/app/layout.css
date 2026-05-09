@@ -1,6 +1,7 @@
 /*!*************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[12].use[3]!./app/globals.css ***!
   \*************************************************************************************************************************************************************************************************************************************************************/
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Sans:wght@300;400;500;600&display=swap');
 
 :root {
@@ -642,3 +643,104 @@ body {
   .wl-form { padding: 20px; }
   .role-toggle { flex-direction: column; }
 }
+.nav-link {
+  color: rgba(240,237,230,0.55);
+  font-size: 14px;
+  text-decoration: none;
+  transition: color 0.2s;
+  font-weight: 400;
+}
+.nav-link:hover { color: #F0EDE6; }
+
+.btn-primary {
+  background: #7B2FFF;
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 13px 28px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, background 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-primary:hover { background: #9B5FFF; transform: translateY(-1px); }
+
+.btn-ghost {
+  background: transparent;
+  color: rgba(240,237,230,0.7);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 12px 28px;
+  border-radius: 6px;
+  border: 1px solid rgba(240,237,230,0.15);
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  display: inline-block;
+}
+.btn-ghost:hover { border-color: rgba(240,237,230,0.4); color: #F0EDE6; }
+
+.feat-card {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 28px;
+  transition: transform 0.2s, border-color 0.2s;
+  cursor: default;
+}
+.feat-card:hover { transform: translateY(-4px); border-color: rgba(255,255,255,0.18); }
+
+.testi-card {
+  background: #111;
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 16px;
+  padding: 28px;
+  transition: transform 0.2s;
+}
+.testi-card:hover { transform: translateY(-3px); }
+
+.plan-card {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 20px;
+  padding: 36px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.plan-card:hover { transform: translateY(-4px); }
+
+.demo-card {
+  background: #141414;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  overflow: hidden;
+}
+.demo-header {
+  background: #1A1A1A;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.dot { width: 10px; height: 10px; border-radius: 50%; }
+
+.reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.reveal.revealed { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }
+@keyframes spin-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+@keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+@keyframes glow { 0%,100%{opacity:0.4} 50%{opacity:0.8} }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+.float { animation: float 4s ease-in-out infinite; }
+.spin-slow { animation: spin-slow 20s linear infinite; }

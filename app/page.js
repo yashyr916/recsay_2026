@@ -1,471 +1,458 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 
+export default function Home() {
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('employer');
+  const [submitted, setSubmitted] = useState(false);
+  const [count, setCount] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
+  const [scrollY, setScrollY] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const heroRef = useRef(null);
 
-const C = {
-  deep:    '#12082E',
-  purple:  '#7B2FFF',
-  purple2: '#9B5FFF',
-  lav:     '#C084FC',
-  lav2:    '#E0BFFF',
-  bg:      '#F8F6FF',
-  border:  '#DDD6FF',
-  border2: '#C4B8FF',
-  muted:   '#5A4880',
-  muted2:  '#8B7AAE',
-  text:    '#1E0F45',
-  grad:    'linear-gradient(135deg,#7B2FFF 0%,#C084FC 100%)',
-};
-
-function useScrollFade() {
-  const ref = useRef(null);
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const obs = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) return;
-      el.classList.add('vis');
-      el.querySelectorAll('.bar-fill[data-w]').forEach(b => { b.style.width = b.dataset.w + '%'; });
-      el.querySelectorAll('.donut-ring[data-pct]').forEach(ring => {
-        const circ = 2 * Math.PI * 48;
-        const pct = parseFloat(ring.dataset.pct);
-        ring.style.strokeDasharray = circ;
-        ring.style.strokeDashoffset = circ - (pct / 100) * circ;
-      });
-      obs.disconnect();
-    }, { threshold: 0.08 });
-    obs.observe(el);
+    // count animation
+    let n = 0;
+    const t = setInterval(() => { n += 9; if (n >= 340) { setCount(340); clearInterval(t); } else setCount(n); }, 14);
+    // scroll
+    const onScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    // step auto-cycle
+    const st = setInterval(() => setActiveStep(s => (s + 1) % 4), 3000);
+    return () => { clearInterval(t); clearInterval(st); window.removeEventListener('scroll', onScroll); };
+  }, []);
+
+  // Intersection observer for reveal
+  useEffect(() => {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('revealed'); });
+    }, { threshold: 0.1 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
     return () => obs.disconnect();
   }, []);
-  return ref;
-}
 
-function RH({ children }) {
-  return <div className="rh">{children}</div>;
-}
-
-// ── SIDEBAR
-function Sidebar({ open, onClose }) {
-  const skills = [
-    { label:'JD Clustering',    pct:94 },
-    { label:'AI Matching',      pct:88 },
-    { label:'Pipeline Auto',    pct:96 },
-    { label:'Keyword Extract',  pct:91 },
-    { label:'Multi-Co Routing', pct:87 },
-  ];
-  const barsRef = useRef([]);
-  useEffect(() => {
-    const t = setTimeout(() => {
-      barsRef.current.forEach((el, i) => { if (el) el.style.width = skills[i].pct + '%'; });
-    }, 500);
-    return () => clearTimeout(t);
-  }, []);
-
-  const [active, setActive] = useState('summary');
-  useEffect(() => {
-    const ids = ['summary','competencies','experience','stats','projects','pricing','references'];
-    const h = () => {
-      const y = window.pageYOffset + 100;
-      for (const id of ids) {
-        const el = document.getElementById(id);
-        if (el && y >= el.offsetTop && y < el.offsetTop + el.offsetHeight) { setActive(id); break; }
-      }
-    };
-    window.addEventListener('scroll', h, { passive: true });
-    return () => window.removeEventListener('scroll', h);
-  }, []);
-
-  const navItems = [
-    ['summary','Summary'],['competencies','How It Works'],['experience','Live Clusters'],
-    ['stats','Achievements'],['projects','Solutions'],['pricing','Plans'],['references','References'],
-  ];
-
-  return (
-    <aside className={`sidebar${open ? ' open' : ''}`}>
-      {/* noise + glow via ::before ::after in globals.css */}
-      <div className="sidebar-identity">
-        <div className="logo-row">
-          <img src="/RecSaySymbol.png" alt="RecSay" className="logo-img"
-            onError={e => { e.target.style.display='none'; e.target.nextSibling.style.display='flex'; }} />
-          <div className="logo-fallback" style={{ display:'none' }}>R</div>
-          <span className="logo-name">RecSay</span>
-        </div>
-        <div className="logo-tagline">Recruitment Intelligence Platform</div>
-        <div className="sidebar-divider" />
-      </div>
-
-      <nav className="sidebar-nav">
-        {navItems.map(([id, label]) => (
-          <a key={id} href={"/login"} className={`nav-item${active===id?' active':''}`} onClick={onClose}>
-            <span className="nav-line" />{label}
-          </a>
-        ))}
-      </nav>
-
-      <div className="sidebar-contact">
-        <div className="contact-item">
-          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-          </svg>
-          Join Waitlist
-        </div>
-        <div className="contact-item">
-          <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10"/>
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/>
-          </svg>
-          recsay.com
-        </div>
-        <a href="/register" className="btn-access">Request Early Access</a>
-        <div className="live-badge">
-          <span className="live-dot" />
-          Now accepting signups
-        </div>
-      </div>
-
-      <div className="sidebar-skills">
-        <div className="skills-label">Platform Capabilities</div>
-        {skills.map((s, i) => (
-          <div key={s.label} className="skill-item">
-            <div className="skill-top">
-              <span>{s.label}</span>
-              <span className="skill-pct">{s.pct}%</span>
-            </div>
-            <div className="skill-track">
-              <div className="skill-fill" ref={el => barsRef.current[i] = el} />
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="sidebar-stats">
-        {[['340+','Early signups'],['5×','Placement reach'],['70%','Match threshold']].map(([n,d]) => (
-          <div key={n} className="stat-row">
-            <div className="stat-num-big">{n}</div>
-            <div className="stat-desc">{d}</div>
-          </div>
-        ))}
-      </div>
-    </aside>
-  );
-}
-
-// ── SUMMARY
-function SummarySection() {
-  const ref = useScrollFade();
-  const [role, setRole] = useState('emp');
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [count, setCount] = useState(340);
-
-  const submit = () => {
-    if (!email || !email.includes('@')) {
-      document.getElementById('emailIn').style.outline = '2px solid #EF4444';
-      setTimeout(() => { document.getElementById('emailIn').style.outline = ''; }, 1500);
-      return;
-    }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!email || !email.includes('@')) return;
     setSubmitted(true);
     setCount(c => c + 1);
     setEmail('');
   };
 
-  return (
-    <section ref={ref} id="summary" className="section-gap fu">
-      <RH>Professional Summary</RH>
-      <h1 style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:'clamp(44px,5.5vw,72px)', fontWeight:700, lineHeight:1.04, letterSpacing:'-1px', color:C.text, marginBottom:24 }}>
-        The Smarter Bridge<br />
-        Between{' '}
-        <span style={{ background:C.grad, WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', fontStyle:'italic' }}>
-          Recruiters
-        </span>
-        <br />&amp; Employers.
-      </h1>
-      <p style={{ fontSize:17, color:C.muted, lineHeight:1.75, maxWidth:600, marginBottom:28, fontWeight:300 }}>
-        RecSay clusters similar job descriptions from multiple employers into one unified role — so recruiters submit once and reach every company that needs that candidate. Zero waste. Infinite pipeline.
-      </p>
-      <div style={{ display:'flex', flexWrap:'wrap', gap:8, marginBottom:36 }}>
-        {['#AI-Powered','#JD-Clustering','#Zero-Waste-Pipeline','#Multi-Company-Routing'].map(t => (
-          <span key={t} style={{ padding:'6px 14px', borderRadius:99, background:'#EDE9FF', border:`1px solid ${C.border2}`, fontSize:11, fontWeight:600, color:C.purple }}>{t}</span>
-        ))}
-      </div>
-      <div className="wl-form">
-        <div className="role-toggle">
-          <button id="roleEmp" className={`role-btn${role==='emp'?' on':''}`} onClick={() => setRole('emp')}>I&apos;m an Employer</button>
-          <button id="roleRec" className={`role-btn${role==='rec'?' on':''}`} onClick={() => setRole('rec')}>I&apos;m a Recruiter</button>
-        </div>
-        <div className="email-row">
-          <input id="emailIn" type="email" value={email} onChange={e => setEmail(e.target.value)}
-            onKeyDown={e => e.key==='Enter' && submit()}
-            placeholder="Enter your work email" />
-          <button onClick={submit}>Join Waitlist →</button>
-        </div>
-        {submitted
-          ? <p className="form-success" style={{ display:'block' }}>✓ You&apos;re on the list. We&apos;ll be in touch soon.</p>
-          : <p className="form-note">Join <strong id="cnt">{count}</strong>+ recruiters &amp; employers already waiting. No spam.</p>
-        }
-      </div>
-    </section>
-  );
-}
-
-// ── COMPETENCIES
-function CompetenciesSection() {
-  const ref = useScrollFade();
-  const comps = [
-    { num:'01', icon:'📋', title:'JD Ingestion',     desc:'Employer uploads or pastes JD. System specifies tech/non-tech track, required skills, seniority.', tag:'Employer Action', tagBg:'#EEF0FF', tagColor:'#4338CA' },
-    { num:'02', icon:'⬡',  title:'Cluster Engine',   desc:'AI extracts keywords, compares all JDs using cosine similarity. 70%+ match groups into one unified cluster.', tag:'AI Step', tagBg:'#EDE9FF', tagColor:'#7B2FFF' },
-    { num:'03', icon:'👤', title:'Candidate Routing', desc:'Recruiter sees one clean cluster card. Submits once — instantly reaches all matched employers.', tag:'Recruiter Action', tagBg:'#F0FDF4', tagColor:'#166534' },
-    { num:'04', icon:'🔁', title:'Pipeline Shift',    desc:'Hired candidates close the loop. Rejected ones auto-route to the next matched employer. Zero waste.', tag:'Automated', tagBg:'#FFF7ED', tagColor:'#C2410C' },
+  const steps = [
+    { n: '01', icon: '📋', title: 'Employer posts JD', desc: 'Upload job description, set role type, required tech stack and seniority level.', color: '#FF6B35' },
+    { n: '02', icon: '⬡', title: 'AI clusters similar JDs', desc: 'Our algorithm extracts keywords and groups JDs with 70%+ match into one unified cluster.', color: '#7B2FFF' },
+    { n: '03', icon: '👤', title: 'Recruiter submits once', desc: 'Recruiter sees one clean card per cluster. One submission reaches all matched employers.', color: '#00D4AA' },
+    { n: '04', icon: '🔁', title: 'Pipeline auto-shifts', desc: 'Hired? Loop closes. Rejected? Candidate shifts automatically to the next matched employer.', color: '#FF3CAC' },
   ];
-  return (
-    <section ref={ref} id="competencies" className="section-gap fu">
-      <RH>Core Competencies</RH>
-      <div className="comp-grid">
-        {comps.map(c => (
-          <div key={c.num} className="comp-card">
-            <div className="comp-num">{c.num}</div>
-            <div className="comp-icon">{c.icon}</div>
-            <div className="comp-title">{c.title}</div>
-            <div className="comp-desc">{c.desc}</div>
-            <span className="comp-tag" style={{ background:c.tagBg, color:c.tagColor }}>{c.tag}</span>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
-// ── EXPERIENCE
-function ExperienceSection() {
-  const ref = useScrollFade();
-  const dimClusters = [
-    { role:'React Developer — Full Stack Hybrid', cos:'Growfast · NovaTech · Axiom Labs', pct:'82%', status:'Filling', detail:'3 employers · 9 candidates in review · 1 offer pending' },
-    { role:'Data Analyst — Mid-level Remote',     cos:'FinEdge · InsightCo · Quantix · Datamind', pct:'75%', status:'Filling', detail:'4 employers · 12 candidates submitted · interviews starting' },
+  const features = [
+    { icon: '⬡', title: 'JD Clustering Engine', desc: 'Cosine similarity algorithm groups 5 employer JDs into 1 unified role card. Zero noise.', color: '#7B2FFF', bg: '#F0EBFF' },
+    { icon: '🔍', title: 'Keyword Extraction', desc: '300+ tech terms. In-house NLP algorithm. No API dependency. Completely free to run.', color: '#FF6B35', bg: '#FFF0EB' },
+    { icon: '🔁', title: 'Auto Pipeline Routing', desc: 'When a candidate is rejected, the system auto-routes them to the next eligible employer.', color: '#00D4AA', bg: '#E6FFF9' },
+    { icon: '📊', title: 'Smart Dashboards', desc: 'Real-time stats, pipeline charts, placement rates for both employers and recruiters.', color: '#FF3CAC', bg: '#FFE6F5' },
+    { icon: '🚀', title: 'Role-based Access', desc: 'Employers and recruiters see completely different interfaces tailored to their workflow.', color: '#FFB800', bg: '#FFFBE6' },
+    { icon: '🔒', title: 'Secure Auth', desc: 'Supabase-powered authentication. Role-based routing on login. Zero friction signup.', color: '#0066FF', bg: '#E6F0FF' },
   ];
-  return (
-    <section ref={ref} id="experience" className="section-gap fu">
-      <RH>Experience — Live Clusters</RH>
 
-      <div className="cluster-entry">
-        <div className="cluster-entry-dot" />
-        <div className="cluster-top">
-          <div>
-            <div className="cluster-role">Python Developer — Senior Remote</div>
-            <div className="cluster-co">TechCorp · DataInc · Finvest · BuildAI · ScaleUp</div>
-          </div>
-          <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
-            <span className="match-chip"><span className="pulsedot" />78% match</span>
-            <span className="cluster-date">Active Now</span>
-          </div>
-        </div>
-        <div className="cluster-pills">
-          {['Python','Django','PostgreSQL','AWS','REST APIs'].map(p => <span key={p} className="c-pill">{p}</span>)}
-        </div>
-        <ul className="cluster-bullets">
-          {['5 employers matched under one unified JD cluster — 78% keyword overlap','15 candidates currently in pipeline distributed across all companies','6 actively interviewing · 2 offers extended · 0 duplicates','Submitted by 3 recruiters — TalentBridge, IndieRecruiter, HireForce'].map(b => (
-            <li key={b}><span>·</span>{b}</li>
-          ))}
-        </ul>
-      </div>
-
-      {dimClusters.map(cl => (
-        <div key={cl.role} className="cluster-entry dim">
-          <div className="cluster-entry-dot dim" />
-          <div className="cluster-top">
-            <div>
-              <div className="cluster-role">{cl.role}</div>
-              <div className="cluster-co">{cl.cos}</div>
-            </div>
-            <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
-              <span className="match-chip"><span className="pulsedot grey" />{cl.pct} match</span>
-              <span className="cluster-date">{cl.status}</span>
-            </div>
-          </div>
-          <ul className="cluster-bullets">
-            <li><span>·</span>{cl.detail}</li>
-          </ul>
-        </div>
-      ))}
-    </section>
-  );
-}
-
-// ── STATS
-function StatsSection() {
-  const ref = useScrollFade();
-  const circ = 2 * Math.PI * 48;
-  const donuts = [{ pct:94, label:'Cluster Hit Rate' },{ pct:88, label:'Placement Rate' },{ pct:96, label:'Pipeline Efficiency' }];
-  const bars = [{ name:'Engineering',pct:85,val:142 },{ name:'Marketing',pct:60,val:89 },{ name:'Design',pct:42,val:56 },{ name:'Leadership',pct:52,val:34 },{ name:'Contract',pct:70,val:78 }];
-  return (
-    <section ref={ref} id="stats" className="section-gap fu">
-      <RH>Achievements &amp; Metrics</RH>
-      <div className="big-stats">
-        {[['5×','More employer reach per submission'],['70%','Keyword match triggers a cluster'],['0','Duplicate candidates per company'],['∞','Pipeline — no candidate wasted']].map(([n,l]) => (
-          <div key={n} className="big-stat">
-            <div className="big-num">{n}</div>
-            <div className="big-lbl">{l}</div>
-          </div>
-        ))}
-      </div>
-      <div className="donuts-row">
-        {donuts.map(d => (
-          <div key={d.label} className="donut-wrap">
-            <svg width="120" height="120" viewBox="0 0 120 120">
-              <defs>
-                <linearGradient id={`dg${d.pct}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#7B2FFF"/><stop offset="100%" stopColor="#C084FC"/>
-                </linearGradient>
-              </defs>
-              <circle cx="60" cy="60" r="48" fill="none" stroke="#EDE9FF" strokeWidth="10"/>
-              <circle cx="60" cy="60" r="48" fill="none" stroke={`url(#dg${d.pct})`} strokeWidth="10"
-                strokeLinecap="round" strokeDasharray={circ} strokeDashoffset={circ}
-                className="donut-ring" data-pct={d.pct}
-                transform="rotate(-90 60 60)"
-                style={{ transition:'stroke-dashoffset 1.5s cubic-bezier(0.4,0,0.2,1)' }}
-              />
-              <text x="60" y="65" textAnchor="middle"
-                style={{ fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, fill:'#7B2FFF' }}>
-                {d.pct}%
-              </text>
-            </svg>
-            <div className="donut-lbl">{d.label}</div>
-          </div>
-        ))}
-      </div>
-      <div className="bars-section">
-        <div className="bars-label">Roles Closed This Month — by Category</div>
-        {bars.map(b => (
-          <div key={b.name} className="bar-row">
-            <div className="bar-name">{b.name}</div>
-            <div className="bar-track"><div className="bar-fill" data-w={b.pct} /></div>
-            <div className="bar-val">{b.val}</div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-// ── PROJECTS
-function ProjectsSection() {
-  const ref = useScrollFade();
-  const projects = [
-    { headStyle:'background:linear-gradient(135deg,#12082E,#3D1A78)', sublabel:'Employer Portal', title:'Post once.\nReceive many.', desc:'Upload your JD and receive pre-qualified candidates from a network of specialized recruiters — without managing 10 agencies.', features:['Company profile with verified hiring details','Tech & non-tech hiring tracks','Batch candidates per role, zero duplicates','Real-time hiring dashboard','Auto-routed pipeline candidates'], cta:'Get Started as Employer →', solid:false },
-    { headStyle:'background:linear-gradient(135deg,#7B2FFF,#C084FC)',  sublabel:'Recruiter Dashboard', title:'Work one role.\nPlace at five.', desc:'Stop reading 50 JDs that say the same thing. Submit once and reach every matched employer simultaneously.', features:['Work solo or under any consultancy','Clustered JD view — one card per role','Submit once, reach multiple companies','Earnings & placement analytics','Real-time candidate stage alerts'], cta:'Get Started as Recruiter →', solid:true },
+  const testimonials = [
+    { quote: 'RecSay cut our sourcing time by 60%. One JD, five companies. It\'s magic.', name: 'Sarah Jenkins', role: 'Talent Lead, Scale.ai', color: '#7B2FFF' },
+    { quote: 'As an independent recruiter, placing at 5 companies with one submission changed everything.', name: 'Arjun Mehta', role: 'Founder, TechRecruit', color: '#FF6B35' },
+    { quote: 'The clustering accuracy is scary good. It knows Python at Fintech ≠ Python at Gaming.', name: 'Marcus Thorne', role: 'CHRO, FinEdge', color: '#00D4AA' },
   ];
-  return (
-    <section ref={ref} id="projects" className="section-gap fu">
-      <RH>Key Projects &amp; Solutions</RH>
-      <div className="proj-grid">
-        {projects.map(p => (
-          <div key={p.sublabel} className="proj-card">
-            <div className="proj-head" style={{ background: p.solid ? 'linear-gradient(135deg,#7B2FFF,#C084FC)' : 'linear-gradient(135deg,#12082E,#3D1A78)' }}>
-              <div className="proj-sublabel">{p.sublabel}</div>
-              <div className="proj-title">{p.title.split('\n').map((t,i)=><span key={i}>{t}{i===0&&<br/>}</span>)}</div>
-            </div>
-            <div className="proj-body">
-              <p className="proj-desc">{p.desc}</p>
-              <ul className="proj-features">
-                {p.features.map(f => <li key={f}><span>✓</span>{f}</li>)}
-              </ul>
-              <a href="/register" className={`proj-btn${p.solid?' solid':''}`}>{p.cta}</a>
-              <a href="/recruiter" style={{ fontSize:13, color:'rgba(192,132,252,0.8)', textDecoration:'none', fontWeight:500 }}>Clusters</a>
-<a href="/recruiter/dashboard" style={{ fontSize:13, color:'rgba(192,132,252,0.7)', textDecoration:'none' }}>Dashboard</a>
-            </div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
-// ── PRICING
-function PricingSection() {
-  const ref = useScrollFade();
   const plans = [
-    { name:'Starter',      price:'Free',   issued:'₹0/month',  icon:'🎓', feat:false, desc:'For individuals testing the platform.',         features:['3 active clusters','5 submissions/month','Basic dashboard','Email support'], cta:'Enroll Now' },
-    { name:'Professional', price:'₹2,999', issued:'per month', icon:'⭐', feat:true,  desc:'For active recruiters and growing companies.',  features:['Unlimited clusters','Unlimited submissions','Full analytics','Priority routing','Dedicated manager'], cta:'Get Certified' },
-    { name:'Enterprise',   price:'Custom', issued:'tailored',  icon:'🏢', feat:false, desc:'For large organisations with high-volume needs.',features:['White-label option','API access','Custom thresholds','SLA & dedicated support'], cta:'Contact Sales' },
+    { name: 'Starter', price: 'Free', sub: 'forever', features: ['3 active clusters', '5 submissions/month', 'Basic dashboard', 'Email support'], cta: 'Start free', featured: false },
+    { name: 'Professional', price: '₹2,999', sub: '/month', features: ['Unlimited clusters', 'Unlimited submissions', 'Full analytics', 'Priority routing', 'Dedicated manager'], cta: 'Start free trial', featured: true },
+    { name: 'Enterprise', price: 'Custom', sub: '', features: ['White-label option', 'API access', 'Custom thresholds', 'SLA & support', 'On-premise option'], cta: 'Contact us', featured: false },
   ];
+
   return (
-    <section ref={ref} id="pricing" className="section-gap fu">
-      <RH>Certifications &amp; Plans</RH>
-      <div className="plans-grid">
-        {plans.map(p => (
-          <div key={p.name} className={`plan-card${p.feat?' feat':''}`}>
-            {p.feat && <div className="plan-badge">MOST POPULAR</div>}
-            <div className="plan-icon" style={{ background: p.feat ? 'rgba(192,132,252,0.15)' : '#EDE9FF' }}>{p.icon}</div>
-            <div className="plan-name" style={{ color: p.feat ? C.lav : C.muted }}>{p.name}</div>
-            <div>
-              <div className="plan-price" style={{ color: p.feat ? 'white' : C.text }}>{p.price}</div>
-              <div className="plan-issued" style={{ color: p.feat ? C.lav : C.muted2 }}>Issued by RecSay · {p.issued}</div>
+    <div style={{ fontFamily: "'DM Sans', sans-serif", background: '#0A0A0A', color: '#F0EDE6', overflowX: 'hidden', cursor: 'default' }}>
+      
+
+      {/* ── NAV ── */}
+      <nav style={{
+        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 200,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: '0 52px', height: 64,
+        background: scrollY > 40 ? 'rgba(10,10,10,0.95)' : 'transparent',
+        borderBottom: scrollY > 40 ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+        backdropFilter: scrollY > 40 ? 'blur(20px)' : 'none',
+        transition: 'all 0.3s ease',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 52, height: 52, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(123,47,255,0.6))' }} onError={e => { e.target.style.display='none'; }} />
+          <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>RecSay</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+          {['How it works', 'Features', 'Pricing'].map(l => (
+            <a key={l} href={`#${l.toLowerCase().replace(/ /g,'-')}`} className="nav-link">{l}</a>
+          ))}
+        </div>
+        <div style={{ display: 'flex', gap: 12 }}>
+          <a href="/login" className="btn-ghost" style={{ padding: '9px 20px', fontSize: 13 }}>Sign in</a>
+          <a href="/register" className="btn-primary" style={{ padding: '9px 20px', fontSize: 13 }}>Get started free</a>
+        </div>
+      </nav>
+
+      {/* ── HERO ── */}
+      <section className="hero-section" ref={heroRef} style={{ padding: '130px 52px 80px', maxWidth: 1280, margin: '0 auto', minHeight: '100vh', display: 'flex', alignItems: 'center' }}>
+
+        {/* BIG BG GLOW */}
+        <div style={{ position: 'fixed', top: '10%', left: '30%', width: 600, height: 600, borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,47,255,0.15) 0%, transparent 70%)', pointerEvents: 'none', animation: 'glow 4s ease-in-out infinite' }} />
+        <div style={{ position: 'fixed', top: '40%', right: '10%', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(255,107,53,0.1) 0%, transparent 70%)', pointerEvents: 'none', animation: 'glow 6s ease-in-out infinite 2s' }} />
+
+        <div className="hero-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 72, alignItems: 'center', width: '100%' }}>
+
+          {/* LEFT */}
+          <div>
+            {/* Badge */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'rgba(123,47,255,0.15)', border: '1px solid rgba(123,47,255,0.3)', borderRadius: 99, padding: '6px 14px', marginBottom: 28 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#7B2FFF', display: 'inline-block', animation: 'blink 2s infinite' }} />
+              <span style={{ fontSize: 12, color: '#C084FC', fontWeight: 500, letterSpacing: '0.06em' }}>Now in early access</span>
             </div>
-            <div className="plan-desc" style={{ color: p.feat ? 'rgba(224,191,255,0.7)' : C.muted }}>{p.desc}</div>
-            <ul className="plan-feats" style={{ color: p.feat ? 'rgba(224,191,255,0.75)' : C.muted }}>
-              {p.features.map(f => (
-                <li key={f} style={{ borderTopColor: p.feat ? 'rgba(221,214,255,0.15)' : C.border }}>
-                  <span style={{ color: p.feat ? C.lav : C.purple }}>✓</span>{f}
-                </li>
-              ))}
-            </ul>
-            <button className="plan-cta" style={p.feat
-              ? { background:C.grad, color:'white', boxShadow:'0 4px 16px rgba(123,47,255,0.35)', border:'none' }
-              : { border:`1.5px solid ${C.border2}`, color:C.purple, background:'transparent' }}>
-              {p.cta}
-            </button>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
 
-// ── REFERENCES
-function ReferencesSection() {
-  const ref = useScrollFade();
-  const refs = [
-    { quote:'The clustering feature changed how we source. We close roles in days now, not weeks.', name:'Sarah Jenkins', role:'Talent Lead, Scale.ai' },
-    { quote:'RecSay acts like a force multiplier for our boutique agency. The AI matching is scary accurate.', name:'Arjun Mehta', role:'Founder, TechRecruit' },
-    { quote:'A premium tool for premium hiring. The dashboard feels like a high-end product for data-driven teams.', name:'Marcus Thorne', role:'CHRO, FinEdge' },
-  ];
-  return (
-    <section ref={ref} id="references" className="section-gap fu">
-      <RH>References</RH>
-      <div className="ref-grid">
-        {refs.map(r => (
-          <div key={r.name} className="ref-card">
-            <div className="ref-quote">&ldquo;{r.quote}&rdquo;</div>
-            <div className="ref-name">{r.name}</div>
-            <div className="ref-role">{r.role}</div>
-            <div className="ref-avail">Available upon request</div>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
+            <h1 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(44px, 5vw, 76px)', fontWeight: 800, lineHeight: 1.02, letterSpacing: '-2px', color: 'white', marginBottom: 24 }}>
+              One JD.<br />
+              <span style={{ background: 'linear-gradient(135deg, #FF6B35 0%, #FF3CAC 50%, #7B2FFF 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                Five Companies.
+              </span><br />
+              Zero Waste.
+            </h1>
 
-// ── ROOT
-export default function Home() {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  return (
-    <>
-      <button id="navToggle" className="mobile-nav-toggle" onClick={() => setSidebarOpen(o => !o)} aria-label="Menu">
-        <span /><span /><span />
-      </button>
-      <div id="overlay" className={`sidebar-overlay${sidebarOpen?' show':''}`} onClick={() => setSidebarOpen(false)} />
-      <div className="layout">
-        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        <main className="main">
-          <SummarySection />
-          <CompetenciesSection />
-          <ExperienceSection />
-          <StatsSection />
-          <ProjectsSection />
-          <PricingSection />
-          <ReferencesSection />
-        </main>
+            <p style={{ fontSize: 18, color: 'rgba(240,237,230,0.6)', lineHeight: 1.72, maxWidth: 460, marginBottom: 40, fontWeight: 300 }}>
+              RecSay clusters similar job descriptions from multiple employers into one role — so recruiters submit once and every matched company receives the best candidates.
+            </p>
+
+            {/* Form */}
+            <div style={{ maxWidth: 440 }}>
+              <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+                {['employer', 'recruiter'].map(r => (
+                  <button key={r} onClick={() => setRole(r)} style={{
+                    flex: 1, padding: '10px', borderRadius: 8, border: 'none', cursor: 'pointer',
+                    fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 500,
+                    background: role === r ? 'white' : 'rgba(255,255,255,0.06)',
+                    color: role === r ? '#0A0A0A' : 'rgba(240,237,230,0.5)',
+                    transition: 'all 0.2s', textTransform: 'capitalize',
+                  }}>
+                    I&apos;m {r === 'employer' ? 'an' : 'a'} {r.charAt(0).toUpperCase() + r.slice(1)}
+                  </button>
+                ))}
+              </div>
+              <form onSubmit={handleSubmit} style={{ display: 'flex', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 10, overflow: 'hidden' }}
+                onFocus={e => e.currentTarget.style.borderColor = 'rgba(123,47,255,0.6)'}
+                onBlur={e => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'}
+              >
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your work email"
+                  style={{ flex: 1, padding: '14px 18px', background: 'transparent', border: 'none', outline: 'none', color: 'white', fontFamily: "'DM Sans', sans-serif", fontSize: 15 }} />
+                <button type="submit" className="btn-primary" style={{ borderRadius: '0 8px 8px 0', padding: '14px 22px' }}>
+                  Join waitlist →
+                </button>
+              </form>
+              {submitted
+                ? <p style={{ marginTop: 10, fontSize: 13, color: '#00D4AA', fontWeight: 500 }}>✓ You&apos;re in. We&apos;ll reach out soon.</p>
+                : <p style={{ marginTop: 10, fontSize: 12, color: 'rgba(240,237,230,0.35)' }}>{count}+ people already joined. No spam.</p>
+              }
+            </div>
+          </div>
+
+          {/* RIGHT — LIVE DEMO CARD */}
+          <div className="demo-col float" style={{ position: 'relative' }}>
+            {/* Decorative ring */}
+            <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', border: '1px solid rgba(123,47,255,0.2)', animation: 'spin-slow 20s linear infinite' }}>
+              <div style={{ position: 'absolute', top: -4, left: '50%', width: 8, height: 8, borderRadius: '50%', background: '#7B2FFF', marginLeft: -4 }} />
+            </div>
+
+            <div className="demo-card">
+              <div className="demo-header">
+                <div className="dot" style={{ background: '#FF5F57' }} />
+                <div className="dot" style={{ background: '#FEBC2E' }} />
+                <div className="dot" style={{ background: '#28C840' }} />
+                <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.3)', marginLeft: 8 }}>RecSay — Live Cluster</span>
+              </div>
+              <div style={{ padding: 20 }}>
+                {/* Cluster header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.3)', marginBottom: 4 }}>Active Cluster</div>
+                    <div style={{ fontSize: 15, fontWeight: 500, color: 'white' }}>Python Developer · Senior · Remote</div>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, background: 'rgba(0,212,170,0.12)', border: '1px solid rgba(0,212,170,0.3)', borderRadius: 99, padding: '4px 10px' }}>
+                    <span style={{ width: 5, height: 5, borderRadius: '50%', background: '#00D4AA', display: 'inline-block', animation: 'blink 2s infinite' }} />
+                    <span style={{ fontSize: 10, color: '#00D4AA', fontWeight: 600 }}>LIVE</span>
+                  </div>
+                </div>
+
+                {/* Companies */}
+                <div style={{ marginBottom: 14 }}>
+                  <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', marginBottom: 8, textTransform: 'uppercase', letterSpacing: '0.08em' }}>5 employers matched</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
+                    {['TechCorp','DataInc','Finvest','BuildAI','ScaleUp'].map(co => (
+                      <span key={co} style={{ background: 'rgba(123,47,255,0.15)', border: '1px solid rgba(123,47,255,0.3)', borderRadius: 4, padding: '4px 9px', fontSize: 11, fontWeight: 600, color: '#C084FC' }}>{co} ✓</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Match score */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '10px 14px', marginBottom: 14 }}>
+                  <div style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 32, fontWeight: 800, color: '#7B2FFF', lineHeight: 1 }}>78%</div>
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 500, color: 'rgba(255,255,255,0.8)', marginBottom: 2 }}>Keyword match</div>
+                    <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>Python · Django · PostgreSQL · AWS</div>
+                  </div>
+                </div>
+
+                {/* Recruiters */}
+                <div style={{ marginBottom: 14 }}>
+                  {[['Priya S.', 'TalentBridge', 5], ['Arjun M.', 'IndieRecruiter', 5]].map(([n, o, c]) => (
+                    <div key={n} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderTop: '1px solid rgba(255,255,255,0.05)', fontSize: 12 }}>
+                      <span style={{ color: 'rgba(255,255,255,0.6)' }}>{n} · <span style={{ color: 'rgba(255,255,255,0.35)' }}>{o}</span></span>
+                      <span style={{ color: '#C084FC', fontWeight: 600 }}>{c} candidates</span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Stats */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 8 }}>
+                  {[['10', 'Pipeline', '#7B2FFF'], ['4', 'Interviews', '#00D4AA'], ['1', 'Offer', '#FF6B35']].map(([n, l, col]) => (
+                    <div key={l} style={{ background: 'rgba(255,255,255,0.04)', borderRadius: 8, padding: '10px', textAlign: 'center' }}>
+                      <div style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 22, fontWeight: 700, color: col, lineHeight: 1 }}>{n}</div>
+                      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.35)', marginTop: 3 }}>{l}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Floating badges */}
+            <div style={{ position: 'absolute', top: -16, left: -16, background: '#FF6B35', borderRadius: 10, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: 'white', boxShadow: '0 8px 24px rgba(255,107,53,0.4)', animation: 'float 3s ease-in-out infinite 0.5s' }}>
+              +5 employers matched
+            </div>
+            <div style={{ position: 'absolute', bottom: 24, right: -20, background: '#00D4AA', borderRadius: 10, padding: '8px 14px', fontSize: 12, fontWeight: 700, color: '#0A0A0A', boxShadow: '0 8px 24px rgba(0,212,170,0.4)', animation: 'float 4s ease-in-out infinite 1s' }}>
+              1 candidate → 5 companies
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── MARQUEE ── */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '18px 0', overflow: 'hidden', background: 'rgba(123,47,255,0.05)' }}>
+        <div style={{ display: 'flex', animation: 'marquee 20s linear infinite', width: 'max-content', gap: 60 }}>
+          {['JD Clustering','Cosine Similarity','Pipeline Routing','Smart Matching','Auto Shift','Zero Duplicates','5× Reach','Keyword Extraction','Recruiter Intelligence','Employer Network',
+            'JD Clustering','Cosine Similarity','Pipeline Routing','Smart Matching','Auto Shift','Zero Duplicates','5× Reach','Keyword Extraction','Recruiter Intelligence','Employer Network'].map((t, i) => (
+            <span key={i} style={{ fontSize: 13, fontWeight: 500, color: i % 3 === 0 ? '#7B2FFF' : i % 3 === 1 ? '#FF6B35' : 'rgba(240,237,230,0.25)', letterSpacing: '0.04em', whiteSpace: 'nowrap' }}>
+              {i % 5 === 0 ? '⬡' : '·'} {t}
+            </span>
+          ))}
+        </div>
       </div>
-    </>
+
+      {/* ── HOW IT WORKS ── */}
+      <section id="how-it-works" className="section-pad" style={{ padding: '120px 52px', maxWidth: 1280, margin: '0 auto' }}>
+        <div className="reveal" style={{ marginBottom: 64 }}>
+          <div style={{ display: 'inline-block', fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#7B2FFF', marginBottom: 16 }}>The Process</div>
+          <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(32px, 4vw, 56px)', fontWeight: 800, lineHeight: 1.05, letterSpacing: '-1.5px', color: 'white', maxWidth: 600 }}>
+            From job description<br />to hire — <span style={{ color: '#7B2FFF' }}>intelligently.</span>
+          </h2>
+        </div>
+
+        <div className="steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+          {steps.map((step, i) => (
+            <div key={i} className="reveal" style={{ transitionDelay: `${i * 0.1}s` }}
+              onClick={() => setActiveStep(i)}
+            >
+              <div style={{
+                background: activeStep === i ? step.color : '#111',
+                border: `1px solid ${activeStep === i ? step.color : 'rgba(255,255,255,0.07)'}`,
+                borderRadius: 16, padding: '28px 24px', cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                transform: activeStep === i ? 'scale(1.02)' : 'scale(1)',
+                boxShadow: activeStep === i ? `0 20px 60px ${step.color}40` : 'none',
+              }}>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.16em', color: activeStep === i ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.25)', marginBottom: 16 }}>{step.n}</div>
+                <div style={{ fontSize: 26, marginBottom: 14 }}>{step.icon}</div>
+                <h3 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 17, fontWeight: 700, color: 'white', marginBottom: 10 }}>{step.title}</h3>
+                <p style={{ fontSize: 13, color: activeStep === i ? 'rgba(255,255,255,0.75)' : 'rgba(240,237,230,0.4)', lineHeight: 1.6 }}>{step.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── STATS BAND ── */}
+      <div style={{ background: 'rgba(123,47,255,0.08)', borderTop: '1px solid rgba(123,47,255,0.15)', borderBottom: '1px solid rgba(123,47,255,0.15)', padding: '60px 52px' }}>
+        <div style={{ maxWidth: 1000, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 1, background: 'rgba(255,255,255,0.05)', borderRadius: 16, overflow: 'hidden' }}>
+          {[['5×', 'More employer reach per submission'], ['70%', 'Keyword match triggers a cluster'], ['0', 'Duplicate candidates per company'], ['∞', 'Pipeline — no candidate wasted']].map(([n, l], i) => (
+            <div key={i} className="reveal" style={{ background: '#0A0A0A', padding: '40px 24px', textAlign: 'center', transitionDelay: `${i * 0.1}s` }}>
+              <div style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 52, fontWeight: 800, letterSpacing: '-2px', lineHeight: 1, marginBottom: 8, color: i === 0 ? '#FF6B35' : i === 1 ? '#7B2FFF' : i === 2 ? '#00D4AA' : '#FF3CAC' }}>{n}</div>
+              <div style={{ fontSize: 13, color: 'rgba(240,237,230,0.4)', lineHeight: 1.5 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* ── FEATURES ── */}
+      <section id="features" className="section-pad" style={{ padding: '120px 52px', maxWidth: 1280, margin: '0 auto' }}>
+        <div className="reveal" style={{ marginBottom: 64 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF6B35', marginBottom: 16 }}>Built different</div>
+          <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(32px, 4vw, 56px)', fontWeight: 800, lineHeight: 1.05, letterSpacing: '-1.5px', color: 'white' }}>
+            Everything you need.<br />Nothing you don&apos;t.
+          </h2>
+        </div>
+        <div className="feat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {features.map((f, i) => (
+            <div key={i} className={`feat-card reveal reveal-delay-${(i % 4) + 1}`}>
+              <div style={{ width: 44, height: 44, borderRadius: 10, background: `${f.color}18`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20, marginBottom: 16 }}>{f.icon}</div>
+              <h3 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 17, fontWeight: 700, color: 'white', marginBottom: 8 }}>{f.title}</h3>
+              <p style={{ fontSize: 14, color: 'rgba(240,237,230,0.45)', lineHeight: 1.65 }}>{f.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FOR WHO ── */}
+      <section style={{ padding: '0 52px 120px', maxWidth: 1280, margin: '0 auto' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+          {/* Employer */}
+          <div className="reveal" style={{ background: 'linear-gradient(135deg, #1A0A3C 0%, #2D1060 100%)', border: '1px solid rgba(123,47,255,0.3)', borderRadius: 24, overflow: 'hidden' }}>
+            <div style={{ padding: '40px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(192,132,252,0.7)', marginBottom: 12 }}>For Employers</div>
+              <h3 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 34, fontWeight: 800, color: 'white', lineHeight: 1.1, marginBottom: 16 }}>Post once.<br />Receive many.</h3>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, marginBottom: 28 }}>Upload your JD and let RecSay bring pre-qualified candidates from a network of specialized recruiters — without managing 10 agencies.</p>
+              <ul style={{ listStyle: 'none', marginBottom: 32 }}>
+                {['Company profile + verified details', 'Tech & non-tech hiring tracks', 'Zero duplicate candidates', 'Real-time hiring dashboard'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 10, padding: '9px 0', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>
+                    <span style={{ color: '#7B2FFF', fontWeight: 700 }}>✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/register" className="btn-primary">Get started as Employer →</a>
+            </div>
+          </div>
+          {/* Recruiter */}
+          <div className="reveal reveal-delay-2" style={{ background: 'linear-gradient(135deg, #1A1A0A 0%, #2D2010 100%)', border: '1px solid rgba(255,107,53,0.3)', borderRadius: 24, overflow: 'hidden' }}>
+            <div style={{ padding: '40px' }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.16em', textTransform: 'uppercase', color: 'rgba(255,107,53,0.7)', marginBottom: 12 }}>For Recruiters</div>
+              <h3 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 34, fontWeight: 800, color: 'white', lineHeight: 1.1, marginBottom: 16 }}>Work one role.<br />Place at five.</h3>
+              <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.55)', lineHeight: 1.65, marginBottom: 28 }}>Stop reading 50 JDs that say the same thing. RecSay clusters them so one strong candidate submission reaches all matched employers simultaneously.</p>
+              <ul style={{ listStyle: 'none', marginBottom: 32 }}>
+                {['Work solo or under any consultancy', 'Clustered JD view — one card per role', 'Submit once, reach 5 companies', 'Earnings & placement analytics'].map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 10, padding: '9px 0', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: 14, color: 'rgba(255,255,255,0.6)' }}>
+                    <span style={{ color: '#FF6B35', fontWeight: 700 }}>✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/register" className="btn-primary" style={{ background: '#FF6B35' }}>Get started as Recruiter →</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── TESTIMONIALS ── */}
+      <section style={{ padding: '0 52px 120px', maxWidth: 1280, margin: '0 auto' }}>
+        <div className="reveal" style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#00D4AA', marginBottom: 16 }}>Social proof</div>
+          <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 800, lineHeight: 1.05, letterSpacing: '-1.5px', color: 'white' }}>
+            What early users say.
+          </h2>
+        </div>
+        <div className="testi-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {testimonials.map((t, i) => (
+            <div key={i} className={`testi-card reveal reveal-delay-${i + 1}`} style={{ borderTop: `3px solid ${t.color}` }}>
+              <div style={{ fontSize: 40, color: t.color, fontFamily: 'serif', lineHeight: 1, marginBottom: 16 }}>&ldquo;</div>
+              <p style={{ fontSize: 15, color: 'rgba(240,237,230,0.7)', lineHeight: 1.7, marginBottom: 24, fontStyle: 'italic' }}>{t.quote}</p>
+              <div style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{t.name}</div>
+              <div style={{ fontSize: 12, color: 'rgba(240,237,230,0.4)', marginTop: 3 }}>{t.role}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── PRICING ── */}
+      <section id="pricing" style={{ padding: '0 52px 120px', maxWidth: 1280, margin: '0 auto' }}>
+        <div className="reveal" style={{ marginBottom: 56 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#FF3CAC', marginBottom: 16 }}>Pricing</div>
+          <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(32px, 4vw, 52px)', fontWeight: 800, lineHeight: 1.05, letterSpacing: '-1.5px', color: 'white' }}>
+            Simple pricing.<br />No surprises.
+          </h2>
+        </div>
+        <div className="plans-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+          {plans.map((plan, i) => (
+            <div key={i} className={`plan-card reveal reveal-delay-${i + 1}`} style={{
+              background: plan.featured ? 'linear-gradient(135deg, #1A0A3C, #3D1A78)' : '#111',
+              border: plan.featured ? '1px solid rgba(123,47,255,0.5)' : '1px solid rgba(255,255,255,0.07)',
+              transform: plan.featured ? 'scale(1.03)' : 'scale(1)',
+              boxShadow: plan.featured ? '0 24px 60px rgba(123,47,255,0.25)' : 'none',
+            }}>
+              {plan.featured && <div style={{ background: 'linear-gradient(90deg, #7B2FFF, #FF3CAC)', color: 'white', fontSize: 10, fontWeight: 700, letterSpacing: '0.12em', padding: '6px 14px', borderRadius: '0 0 10px 10px', display: 'inline-block', marginBottom: 8 }}>MOST POPULAR</div>}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.14em', textTransform: 'uppercase', color: plan.featured ? '#C084FC' : 'rgba(240,237,230,0.4)', marginBottom: 12 }}>{plan.name}</div>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
+                  <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 44, fontWeight: 800, color: 'white', letterSpacing: '-1px', lineHeight: 1 }}>{plan.price}</span>
+                  <span style={{ fontSize: 14, color: 'rgba(240,237,230,0.4)' }}>{plan.sub}</span>
+                </div>
+              </div>
+              <ul style={{ listStyle: 'none', flex: 1 }}>
+                {plan.features.map(f => (
+                  <li key={f} style={{ display: 'flex', gap: 10, padding: '9px 0', borderTop: '1px solid rgba(255,255,255,0.06)', fontSize: 13, color: 'rgba(240,237,230,0.6)' }}>
+                    <span style={{ color: plan.featured ? '#C084FC' : '#7B2FFF', fontWeight: 700 }}>✓</span>{f}
+                  </li>
+                ))}
+              </ul>
+              <a href="/register" style={{
+                display: 'block', textAlign: 'center', padding: '13px', borderRadius: 8,
+                fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 600,
+                textDecoration: 'none', transition: 'all 0.2s',
+                background: plan.featured ? 'linear-gradient(135deg, #7B2FFF, #FF3CAC)' : 'transparent',
+                color: plan.featured ? 'white' : 'rgba(240,237,230,0.6)',
+                border: plan.featured ? 'none' : '1px solid rgba(255,255,255,0.12)',
+                boxShadow: plan.featured ? '0 8px 24px rgba(123,47,255,0.3)' : 'none',
+              }}>{plan.cta}</a>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── BOTTOM CTA ── */}
+      <section style={{ padding: '0 52px 140px' }}>
+        <div className="reveal" style={{ maxWidth: 900, margin: '0 auto', background: 'linear-gradient(135deg, #1A0A3C 0%, #0A0A0A 50%, #1A0A14 100%)', border: '1px solid rgba(123,47,255,0.2)', borderRadius: 32, padding: '80px 60px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,47,255,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 64, height: 64, objectFit: 'contain', marginBottom: 24, filter: 'drop-shadow(0 0 20px rgba(123,47,255,0.5))' }} onError={e => e.target.style.display='none'} />
+          <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 800, letterSpacing: '-2px', color: 'white', lineHeight: 1.05, marginBottom: 16 }}>
+            Be first on<br /><span style={{ background: 'linear-gradient(135deg, #FF6B35, #FF3CAC, #7B2FFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>the bridge.</span>
+          </h2>
+          <p style={{ fontSize: 17, color: 'rgba(240,237,230,0.5)', marginBottom: 44, lineHeight: 1.65 }}>
+            RecSay is launching soon. Join early access — whether you&apos;re hiring or placing, we&apos;ll onboard you in the first batch.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <a href="/register?role=employer" className="btn-primary" style={{ background: '#7B2FFF', padding: '14px 32px', fontSize: 15 }}>Join as Employer</a>
+            <a href="/register?role=recruiter" className="btn-ghost" style={{ padding: '14px 32px', fontSize: 15 }}>Join as Recruiter</a>
+          </div>
+          <p style={{ marginTop: 20, fontSize: 13, color: 'rgba(240,237,230,0.25)' }}>{count}+ people already on the waitlist</p>
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer style={{ borderTop: '1px solid rgba(255,255,255,0.06)', padding: '40px 52px' }}>
+        <div className="footer-grid" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 20 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 22, height: 22, objectFit: 'contain' }} onError={e => e.target.style.display='none'} />
+            <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 16, fontWeight: 800, color: 'white' }}>RecSay</span>
+          </div>
+          <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap' }}>
+            {['How it works', 'Features', 'Pricing', 'Login', 'Register'].map(l => (
+              <a key={l} href={l === 'Login' ? '/login' : l === 'Register' ? '/register' : `#${l.toLowerCase().replace(/ /g,'-')}`}
+                style={{ fontSize: 13, color: 'rgba(240,237,230,0.35)', textDecoration: 'none', transition: 'color 0.2s' }}
+                onMouseEnter={e => e.target.style.color = 'rgba(240,237,230,0.8)'}
+                onMouseLeave={e => e.target.style.color = 'rgba(240,237,230,0.35)'}
+              >{l}</a>
+            ))}
+          </div>
+          <p style={{ fontSize: 13, color: 'rgba(240,237,230,0.2)' }}>© 2025 RecSay. All rights reserved.</p>
+        </div>
+      </footer>
+    </div>
   );
 }

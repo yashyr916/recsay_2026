@@ -1,5 +1,4 @@
 {
-  "/employer/candidates/page": "app/employer/candidates/page.js",
-  "/page": "app/page.js",
-  "/api/pipeline-shift/route": "app/api/pipeline-shift/route.js"
+  "/_not-found/page": "app/_not-found/page.js",
+  "/page": "app/page.js"
 }
