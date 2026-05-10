@@ -789,3 +789,16 @@ body {
 
 .float { animation: float 4s ease-in-out infinite; }
 .spin-slow { animation: spin-slow 20s linear infinite; }
+
+@media (max-width: 768px) {
+  .for-who-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .nav-links-hide { display: none !important; }
+}
+@media (max-width: 768px) {
+  .steps-grid { grid-template-columns: 1fr !important; }
+  .for-who-grid { grid-template-columns: 1fr !important; }
+  .nav-links-hide { display: none !important; }
+}

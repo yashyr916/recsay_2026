@@ -86,8 +86,8 @@ export default function Home() {
           <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 70, height: 70, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(123,47,255,0.6))' }} onError={e => { e.target.style.display='none'; }} />
           <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>RecSay</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
-          {['How it works', 'Features', 'Pricing'].map(l => (
+        <div className="nav-links-hide" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
+  {['How it works', 'Features', 'Pricing'].map(l => (
             <a key={l} href={`#${l.toLowerCase().replace(/ /g,'-')}`} className="nav-link">{l}</a>
           ))}
         </div>
@@ -314,7 +314,7 @@ export default function Home() {
 
       {/* ── FOR WHO ── */}
       <section style={{ padding: '0 52px 120px', maxWidth: 1280, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+  <div className="for-who-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
           {/* Employer */}
           <div className="reveal" style={{ background: 'linear-gradient(135deg, #1A0A3C 0%, #2D1060 100%)', border: '1px solid rgba(123,47,255,0.3)', borderRadius: 24, overflow: 'hidden' }}>
             <div style={{ padding: '40px' }}>
