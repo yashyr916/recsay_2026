@@ -833,3 +833,20 @@ body {
 }
 .auth-btn:hover { opacity: 0.88; transform: translateY(-1px); }
 .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.auth-left {
+  display: flex;
+}
+
+@media (max-width: 768px) {
+  .auth-left {
+    display: none !important;
+  }
+}
+
+.auth-left {
+  display: flex;
+}
+@media (max-width: 768px) {
+  .auth-left { display: none !important; }
+}

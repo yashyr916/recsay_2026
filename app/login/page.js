@@ -27,7 +27,7 @@ export default function Login() {
    
 
       {/* LEFT PANEL */}
-      <div style={{ flex:1, background:'linear-gradient(135deg,#1A0A3C 0%,#0A0A0A 100%)', display:'flex', flexDirection:'column', justifyContent:'center', padding:'60px', position:'relative', overflow:'hidden' }}>
+      <div className="auth-left" style={{ flex:1, background:'linear-gradient(135deg,#1A0A3C 0%,#0A0A0A 100%)', display:'flex', flexDirection:'column', justifyContent:'center', padding:'60px', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', top:'20%', left:'10%', width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle,rgba(123,47,255,0.2) 0%,transparent 70%)', pointerEvents:'none' }} />
         <a href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none', marginBottom:60 }}>
           <img src="/RecSaySymbol.png" alt="RecSay" style={{ width:36, height:36, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
