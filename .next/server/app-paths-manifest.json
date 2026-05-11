@@ -1,5 +1,9 @@
 {
-  "/login/page": "app/login/page.js",
-  "/register/page": "app/register/page.js",
-  "/page": "app/page.js"
+  "/page": "app/page.js",
+  "/employer/page": "app/employer/page.js",
+  "/employer/dashboard/page": "app/employer/dashboard/page.js",
+  "/employer/candidates/page": "app/employer/candidates/page.js",
+  "/recruiter/dashboard/page": "app/recruiter/dashboard/page.js",
+  "/recruiter/page": "app/recruiter/page.js",
+  "/login/page": "app/login/page.js"
 }
