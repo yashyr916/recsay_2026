@@ -29,9 +29,9 @@ export default function Register() {
       {/* LEFT — hidden on mobile via CSS class */}
       <div className="auth-left" style={{ flex:1, background:'linear-gradient(135deg,#0A1A1A 0%,#0A0A0A 100%)', flexDirection:'column', justifyContent:'center', padding:'60px', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', top:'20%', left:'10%', width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle,rgba(0,212,170,0.15) 0%,transparent 70%)', pointerEvents:'none' }} />
-        <a href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none', marginBottom:60 }}>
-          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width:36, height:36, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
-          <span style={{ fontFamily:"'Syne',sans-serif", fontSize:22, fontWeight:800, color:'white' }}>RecSay</span>
+        <a href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none', marginBottom:0 }}>
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width:172, height:172, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+          <span style={{ fontFamily:"'Syne',sans-serif", fontSize:50, fontWeight:800, color:'white' }}>RecSay</span>
         </a>
         <h1 style={{ fontFamily:"'Syne',sans-serif", fontSize:'clamp(32px,4vw,52px)', fontWeight:800, lineHeight:1.05, letterSpacing:'-1.5px', color:'white', marginBottom:20 }}>
           Join the bridge.<br />Start placing<br /><span style={{ color:'#00D4AA' }}>smarter.</span>

@@ -29,9 +29,9 @@ export default function Login() {
       {/* LEFT PANEL */}
       <div className="auth-left" style={{ flex:1, background:'linear-gradient(135deg,#1A0A3C 0%,#0A0A0A 100%)', display:'flex', flexDirection:'column', justifyContent:'center', padding:'60px', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', top:'20%', left:'10%', width:300, height:300, borderRadius:'50%', background:'radial-gradient(circle,rgba(123,47,255,0.2) 0%,transparent 70%)', pointerEvents:'none' }} />
-        <a href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none', marginBottom:60 }}>
-          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width:36, height:36, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
-          <span style={{ fontFamily:"'Syne',sans-serif", fontSize:22, fontWeight:800, color:'white' }}>RecSay</span>
+        <a href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none', marginBottom:0 }}>
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width:172, height:172, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+          <span style={{ fontFamily:"'Syne',sans-serif", fontSize:50, fontWeight:800, color:'white' }}>RecSay</span>
         </a>
         <h1 style={{ fontFamily:"'Syne',sans-serif", fontSize:'clamp(36px,4vw,56px)', fontWeight:800, lineHeight:1.05, letterSpacing:'-1.5px', color:'white', marginBottom:20 }}>
           The smarter<br />bridge between<br /><span style={{ background:'linear-gradient(135deg,#FF6B35,#FF3CAC,#7B2FFF)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>recruitment.</span>

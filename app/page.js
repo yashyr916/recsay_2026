@@ -83,8 +83,8 @@ export default function Home() {
         transition: 'all 0.3s ease',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 70, height: 70, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(123,47,255,0.6))' }} onError={e => { e.target.style.display='none'; }} />
-          <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 20, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>RecSay</span>
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 100, height: 100, objectFit: 'contain', filter: 'drop-shadow(0 0 8px rgba(123,47,255,0.6))' }} onError={e => { e.target.style.display='none'; }} />
+          <span style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 30, fontWeight: 800, color: 'white', letterSpacing: '-0.5px' }}>RecSay</span>
         </div>
         <div className="nav-links-hide" style={{ display: 'flex', alignItems: 'center', gap: 36 }}>
   {['How it works', 'Features', 'Pricing'].map(l => (
@@ -419,7 +419,7 @@ export default function Home() {
       <section style={{ padding: '0 52px 140px' }}>
         <div className="reveal" style={{ maxWidth: 900, margin: '0 auto', background: 'linear-gradient(135deg, #1A0A3C 0%, #0A0A0A 50%, #1A0A14 100%)', border: '1px solid rgba(123,47,255,0.2)', borderRadius: 32, padding: '80px 60px', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
           <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%,-50%)', width: 400, height: 400, borderRadius: '50%', background: 'radial-gradient(circle, rgba(123,47,255,0.15) 0%, transparent 70%)', pointerEvents: 'none' }} />
-          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 64, height: 64, objectFit: 'contain', marginBottom: 24, filter: 'drop-shadow(0 0 20px rgba(123,47,255,0.5))' }} onError={e => e.target.style.display='none'} />
+          <img src="/RecSaySymbol.png" alt="RecSay" style={{ width: 164, height: 164, objectFit: 'contain', marginBottom: 24, filter: 'drop-shadow(0 0 20px rgba(123,47,255,0.5))' }} onError={e => e.target.style.display='none'} />
           <h2 style={{ fontFamily: "'Cabinet Grotesk', sans-serif", fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 800, letterSpacing: '-2px', color: 'white', lineHeight: 1.05, marginBottom: 16 }}>
             Be first on<br /><span style={{ background: 'linear-gradient(135deg, #FF6B35, #FF3CAC, #7B2FFF)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>the bridge.</span>
           </h2>
