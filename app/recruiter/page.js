@@ -31,7 +31,34 @@ export default function RecruiterPage() {
       note: candidate.note, cluster_id: selectedCluster.id,
       recruiter_id: user.id, status: 'submitted',
     }]);
-    if (!error) { setSuccess(true); setCandidate({ name:'', email:'', phone:'', skills:'', note:'' }); setTimeout(()=>{ setShowForm(false); setSuccess(false); }, 2000); }
+    if (!error) { 
+      // Send email notification to employer
+await fetch('/api/send-email', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    to: 'yashraj.vbeyond@gmail.com', // your email for testing
+    subject: `New candidate for ${selectedCluster.title} — RecSay`,
+    html: `
+      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;background:#0A0A0A;padding:32px;border-radius:12px">
+        <div style="margin-bottom:24px">
+          <img src="https://recsay.com/RecSaySymbol.png" width="40" style="margin-bottom:12px"/>
+          <h2 style="color:#7B2FFF;margin:0;font-size:22px">New Candidate Submitted</h2>
+        </div>
+        <p style="color:#aaa;font-size:15px">A recruiter has submitted a candidate for <strong style="color:white">${selectedCluster.title}</strong></p>
+        <div style="background:#111;border:1px solid #222;border-radius:8px;padding:20px;margin:20px 0">
+          <p style="margin:0 0 8px;color:#aaa;font-size:13px">CANDIDATE DETAILS</p>
+          <p style="margin:6px 0;color:white;font-size:15px"><strong>Name:</strong> ${candidate.name}</p>
+          <p style="margin:6px 0;color:white;font-size:15px"><strong>Email:</strong> ${candidate.email}</p>
+          <p style="margin:6px 0;color:white;font-size:15px"><strong>Skills:</strong> ${candidate.skills}</p>
+          ${candidate.note ? `<p style="margin:6px 0;color:white;font-size:15px"><strong>Note:</strong> ${candidate.note}</p>` : ''}
+        </div>
+        <a href="https://recsay.com/employer/candidates" style="display:inline-block;padding:12px 24px;background:#7B2FFF;color:white;border-radius:6px;text-decoration:none;font-weight:600;font-size:14px">Review Candidate on RecSay →</a>
+        <p style="color:#444;font-size:12px;margin-top:24px">You received this because you have an active JD cluster on RecSay.</p>
+      </div>
+    `,
+  }),
+});setSuccess(true); setCandidate({ name:'', email:'', phone:'', skills:'', note:'' }); setTimeout(()=>{ setShowForm(false); setSuccess(false); }, 2000); }
     setLoading(false);
   };
 

@@ -72,6 +72,9 @@ export default function Login() {
           <p style={{ fontSize:14, color:'rgba(255,255,255,0.35)' }}>
             No account?{' '}
             <a href="/register" style={{ color:'#7B2FFF', fontWeight:600, textDecoration:'none' }}>Create one free</a>
+            <p style={{ fontSize:14, color:'rgba(255,255,255,0.35)', marginTop:12 }}>
+            <a href="/forgot-password" style={{ color:'rgba(255,255,255,0.4)', textDecoration:'none' }}>Forgot password?</a>
+          </p>
           </p>
         </div>
 
