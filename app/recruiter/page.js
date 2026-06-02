@@ -86,6 +86,42 @@ export default function RecruiterPage() {
       recruiter_id: user.id, status: 'submitted',
     }]);
     if (!error) {
+  // ADD THIS — email all employers in cluster
+  const { data: clusterJobs } = await supabase
+    .from('jobs')
+    .select('*')
+    .in('id', selectedCluster.job_ids || []);
+
+  for (const job of clusterJobs || []) {
+    const { data: employer } = await supabase.auth.admin
+      ? null
+      : await supabase.from('jobs').select('user_id').eq('id', job.id).single();
+
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: job.company_email || 'yashyr916@gmail.com', // fallback for now
+        subject: `New Candidate for ${selectedCluster.title} — RecSay`,
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:#7B2FFF">New Candidate Submitted</h2>
+            <p>A recruiter submitted a candidate for <strong>${selectedCluster.title}</strong></p>
+            <p><strong>Name:</strong> ${candidate.name}</p>
+            <p><strong>Email:</strong> ${candidate.email}</p>
+            <p><strong>Skills:</strong> ${candidate.skills}</p>
+            <p><strong>Note:</strong> ${candidate.note || 'None'}</p>
+            <a href="https://recsay.com/employer/candidates" 
+               style="background:#7B2FFF;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px">
+              Review Candidate →
+            </a>
+          </div>
+        `,
+      }),
+    });
+  }
+  // END ADD
+  setSuccess(true);
       setSuccess(true);
       setCandidate({ name:'', email:'', phone:'', skills:'', note:'' });
       setTimeout(() => { setShowForm(false); setSuccess(false); }, 2000);

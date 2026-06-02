@@ -28,13 +28,48 @@ export default function EmployerCandidates() {
     setLoading(false);
   };
 
-  const updateStatus = async (candidateId, newStatus, clusterId) => {
-    await supabase.from('candidates').update({ status: newStatus }).eq('id', candidateId);
-    if (newStatus === 'rejected') {
-      await fetch('/api/pipeline-shift', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ candidate_id: candidateId, current_cluster_id: clusterId }) });
-    }
-    fetchCandidates(selectedJob);
+  const updateStatus = async (candidateId, newStatus, clusterId, candidateName, candidateEmail, recruiterEmail) => {
+  await supabase.from('candidates').update({ status: newStatus }).eq('id', candidateId);
+
+  // Email to recruiter on status change
+  const statusMessages = {
+    shortlisted: { subject: `✅ Candidate Shortlisted — RecSay`, color: '#00D4AA', msg: 'shortlisted' },
+    hired:       { subject: `🎉 Placement Confirmed — RecSay`,   color: '#FF6B35', msg: 'hired' },
+    rejected:    { subject: `❌ Candidate Rejected — RecSay`,    color: '#FF3C3C', msg: 'rejected' },
   };
+
+  const s = statusMessages[newStatus];
+  if (s && recruiterEmail) {
+    await fetch('/api/send-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        to: recruiterEmail,
+        subject: s.subject,
+        html: `
+          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
+            <h2 style="color:${s.color}">Candidate ${s.msg}</h2>
+            <p>Your candidate <strong>${candidateName}</strong> has been <strong>${s.msg}</strong>.</p>
+            ${newStatus === 'rejected' ? '<p>Don\'t worry — they\'ve been auto-routed to the next matched employer.</p>' : ''}
+            <a href="https://recsay.com/recruiter/dashboard"
+               style="background:#7B2FFF;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px">
+              View Dashboard →
+            </a>
+          </div>
+        `,
+      }),
+    });
+  }
+
+  if (newStatus === 'rejected') {
+    await fetch('/api/pipeline-shift', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ candidate_id: candidateId, current_cluster_id: clusterId }),
+    });
+  }
+  fetchCandidates(selectedJob);
+};
 
   const logout = async () => { await supabase.auth.signOut(); window.location.href='/login'; };
 
