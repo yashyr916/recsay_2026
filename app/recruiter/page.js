@@ -220,7 +220,7 @@ export default function RecruiterPage() {
                 {paginated.map(cluster => (
                   <div key={cluster.id}
                     onClick={() => openDetailPanel(cluster)}
-                    style={{ background:'#111', border:'1px solid rgba(255,255,255,0.07)', borderRadius:14, overflow:'hidden', transition:'transform 0.2s,border-color 0.2s', cursor:'pointer' }}
+                    style={{ background:'#111', border:'1px solid rgba(255,255,255,0.07)', borderRadius:14, overflow:'visible', transition:'transform 0.2s,border-color 0.2s', cursor:'pointer' }}
                     onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.borderColor='rgba(123,47,255,0.3)'; }}
                     onMouseLeave={e=>{ e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.07)'; }}>
                     <div style={{ background:'linear-gradient(135deg,#1A0A3C,#7B2FFF)', padding:'18px 20px' }}>
