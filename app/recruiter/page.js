@@ -77,57 +77,90 @@ export default function RecruiterPage() {
   // Reset page when filter/search changes
   useEffect(() => { setPage(1); }, [search, filter, sort]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); setLoading(true); setSuccess(false);
-    const { error } = await supabase.from('candidates').insert([{
-      name: candidate.name, email: candidate.email, phone: candidate.phone,
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setSuccess(false);
+
+  // Step 1 — insert candidate
+  const { data: newCandidate, error } = await supabase
+    .from('candidates')
+    .insert([{
+      name: candidate.name,
+      email: candidate.email,
+      phone: candidate.phone,
       skills: candidate.skills.split(',').map(s => s.trim()),
-      note: candidate.note, cluster_id: selectedCluster.id,
-      recruiter_id: user.id, status: 'submitted',
-    }]);
-    if (!error) {
-  // ADD THIS — email all employers in cluster
-  const { data: clusterJobs } = await supabase
-    .from('jobs')
-    .select('*')
-    .in('id', selectedCluster.job_ids || []);
+      note: candidate.note,
+      cluster_id: selectedCluster.id,
+      recruiter_id: user.id,
+      status: 'submitted',
+    }])
+    .select()
+    .single();
 
-  for (const job of clusterJobs || []) {
-    const { data: employer } = await supabase.auth.admin
-      ? null
-      : await supabase.from('jobs').select('user_id').eq('id', job.id).single();
-
-    await fetch('/api/send-email', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        to: job.company_email || 'yashyr916@gmail.com', // fallback for now
-        subject: `New Candidate for ${selectedCluster.title} — RecSay`,
-        html: `
-          <div style="font-family:sans-serif;max-width:600px;margin:0 auto">
-            <h2 style="color:#7B2FFF">New Candidate Submitted</h2>
-            <p>A recruiter submitted a candidate for <strong>${selectedCluster.title}</strong></p>
-            <p><strong>Name:</strong> ${candidate.name}</p>
-            <p><strong>Email:</strong> ${candidate.email}</p>
-            <p><strong>Skills:</strong> ${candidate.skills}</p>
-            <p><strong>Note:</strong> ${candidate.note || 'None'}</p>
-            <a href="https://recsay.com/employer/candidates" 
-               style="background:#7B2FFF;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px">
-              Review Candidate →
-            </a>
-          </div>
-        `,
-      }),
-    });
-  }
-  // END ADD
-  setSuccess(true);
-      setSuccess(true);
-      setCandidate({ name:'', email:'', phone:'', skills:'', note:'' });
-      setTimeout(() => { setShowForm(false); setSuccess(false); }, 2000);
-    }
+  if (error) {
+    console.error('Submit error:', error);
     setLoading(false);
-  };
+    return;
+  }
+
+  // Step 2 — email in background (don't await, don't block UI)
+  sendEmailsInBackground(newCandidate);
+
+  // Step 3 — show success immediately
+  setSuccess(true);
+  setCandidate({ name:'', email:'', phone:'', skills:'', note:'' });
+  setTimeout(() => { setShowForm(false); setSuccess(false); }, 2000);
+  setLoading(false);
+};
+
+// Separate async function — runs in background, never blocks UI
+const sendEmailsInBackground = async (newCandidate) => {
+  try {
+    const jobIds = (selectedCluster.job_ids || []).map(id => String(id));
+    if (jobIds.length === 0) return;
+
+    const { data: jobs } = await supabase
+      .from('jobs')
+      .select('*')
+      .in('id', jobIds);
+
+    for (const job of jobs || []) {
+      // get employer email from auth via their user_id
+      const { data: profile } = await supabase
+        .from('jobs')
+        .select('user_id')
+        .eq('id', job.id)
+        .single();
+
+      // send email — use job.user_id as reference
+      await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: 'yashyr916@gmail.com', // temp until employer emails stored
+          subject: `New Candidate for ${selectedCluster.title} — RecSay`,
+          html: `
+            <div style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:24px">
+              <h2 style="color:#7B2FFF">New Candidate Submitted</h2>
+              <p>A recruiter submitted a candidate for <strong>${selectedCluster.title}</strong></p>
+              <p><strong>Name:</strong> ${newCandidate.name}</p>
+              <p><strong>Email:</strong> ${newCandidate.email}</p>
+              <p><strong>Skills:</strong> ${candidate.skills}</p>
+              <a href="https://recsay.com/employer/candidates"
+                 style="background:#7B2FFF;color:white;padding:12px 24px;border-radius:8px;text-decoration:none;display:inline-block;margin-top:16px">
+                Review Candidate →
+              </a>
+            </div>
+          `,
+        }),
+      });
+    }
+  } catch (err) {
+    console.error('Email background error:', err);
+    // silent fail — candidate already saved
+  }
+};
 
   const logout = async () => { await supabase.auth.signOut(); window.location.href = '/login'; };
 
