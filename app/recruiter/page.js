@@ -614,7 +614,7 @@ export default function RecruiterPage() {
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:16, marginBottom:32 }}>
                 {paginated.map(cluster => (
                   <div key={cluster.id}
-                    onClick={() => openDetailPanel(cluster)}
+                    onClick={() => { console.log('card clicked', cluster.id); openDetailPanel(cluster); }}
                     style={{ background:'#111', border:'1px solid rgba(255,255,255,0.07)', borderRadius:14, overflow:'hidden', transition:'transform 0.2s,border-color 0.2s', cursor:'pointer' }}
                     onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.borderColor='rgba(123,47,255,0.3)'; }}
                     onMouseLeave={e=>{ e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.07)'; }}>
