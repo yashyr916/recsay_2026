@@ -18,6 +18,9 @@ export default function RecruiterPage() {
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('newest');
   const [page, setPage] = useState(1);
+  const [detailPanel, setDetailPanel] = useState(null);
+  const [panelJobs, setPanelJobs] = useState([]);
+  const [panelLoading, setPanelLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -30,6 +33,20 @@ export default function RecruiterPage() {
     const { data } = await supabase.from('clusters').select('*').order('created_at', { ascending: false });
     if (data) setClusters(data);
   };
+  const openDetailPanel = async (cluster) => {
+  setDetailPanel(cluster);
+  setPanelLoading(true);
+  setPanelJobs([]);
+  const jobIds = (cluster.job_ids || []).map(id => String(id));
+  if (jobIds.length > 0) {
+    const { data: jobs } = await supabase
+      .from('jobs')
+      .select('id, title, description, type, company_name')
+      .in('id', jobIds);
+    setPanelJobs(jobs || []);
+  }
+  setPanelLoading(false);
+};
 
   // Filter + Search + Sort logic
   const filtered = useMemo(() => {
@@ -278,6 +295,7 @@ const sendEmailsInBackground = async (newCandidate) => {
               <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:16, marginBottom:32 }}>
                 {paginated.map(cluster => (
                   <div key={cluster.id}
+                    onClick={() => openDetailPanel(cluster)}
                     style={{ background:'#111', border:'1px solid rgba(255,255,255,0.07)', borderRadius:14, overflow:'hidden', transition:'transform 0.2s,border-color 0.2s' }}
                     onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.borderColor='rgba(123,47,255,0.3)'; }}
                     onMouseLeave={e=>{ e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.borderColor='rgba(255,255,255,0.07)'; }}>
