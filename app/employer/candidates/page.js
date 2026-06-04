@@ -21,22 +21,33 @@ export default function EmployerCandidates() {
     if (data) setJobs(data);
   };
 
-  // FIXED: accepts job as parameter instead of reading from state (avoids stale closure)
-  const fetchCandidates = async (job) => {
+  // selectJob: only called from sidebar click — sets job + loads candidates
+  const selectJob = (job) => {
     setSelectedJob(job);
+    loadCandidates(job.cluster_id);
+  };
+
+  // loadCandidates: pure fetch, never touches selectedJob state
+  const loadCandidates = async (clusterId) => {
     setLoading(true);
     const { data } = await supabase
       .from('candidates')
       .select('*')
-      .eq('cluster_id', job.cluster_id)
+      .eq('cluster_id', clusterId)
       .order('created_at', { ascending: false });
     if (data) setCandidates(data);
     setLoading(false);
   };
 
-  // FIXED: job passed explicitly so fetchCandidates always gets correct reference
-  const updateStatus = async (candidateId, newStatus, clusterId, job) => {
+  // updateStatus: optimistic UI update first, then DB, then refresh
+  const updateStatus = async (candidateId, newStatus, clusterId) => {
+    // Immediately reflect change in UI — no flicker/reset
+    setCandidates(prev =>
+      prev.map(c => c.id === candidateId ? { ...c, status: newStatus } : c)
+    );
+
     await supabase.from('candidates').update({ status: newStatus }).eq('id', candidateId);
+
     if (newStatus === 'rejected') {
       await fetch('/api/pipeline-shift', {
         method: 'POST',
@@ -44,7 +55,9 @@ export default function EmployerCandidates() {
         body: JSON.stringify({ candidate_id: candidateId, current_cluster_id: clusterId }),
       });
     }
-    await fetchCandidates(job);
+
+    // Sync with DB after all ops done
+    loadCandidates(clusterId);
   };
 
   const logout = async () => { await supabase.auth.signOut(); window.location.href = '/login'; };
@@ -65,7 +78,6 @@ export default function EmployerCandidates() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0A0A0A', fontFamily: "'DM Sans',sans-serif", color: 'white' }}>
-      {/* NAV */}
       <div style={{ background: '#0D0D0D', borderBottom: '1px solid rgba(255,255,255,0.06)', padding: '0 40px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: 60 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 32 }}>
           <a href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none' }}>
@@ -91,12 +103,11 @@ export default function EmployerCandidates() {
       </div>
 
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '48px 40px', display: 'grid', gridTemplateColumns: '280px 1fr', gap: 28 }}>
-        {/* JOB LIST */}
         <div>
           <h2 style={{ fontFamily: "'Syne',sans-serif", fontSize: 20, fontWeight: 800, marginBottom: 6 }}>Your JDs</h2>
           <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', marginBottom: 20 }}>Select to see candidates</p>
           {jobs.map(job => (
-            <div key={job.id} onClick={() => fetchCandidates(job)}
+            <div key={job.id} onClick={() => selectJob(job)}
               style={{
                 background: selectedJob?.id === job.id ? 'rgba(123,47,255,0.15)' : '#111',
                 border: `1px solid ${selectedJob?.id === job.id ? 'rgba(123,47,255,0.4)' : 'rgba(255,255,255,0.07)'}`,
@@ -112,7 +123,6 @@ export default function EmployerCandidates() {
           ))}
         </div>
 
-        {/* CANDIDATES */}
         <div>
           {!selectedJob
             ? (
@@ -188,7 +198,7 @@ export default function EmployerCandidates() {
                                 return (
                                   <button
                                     key={label}
-                                    onClick={() => updateStatus(c.id, status, c.cluster_id, selectedJob)}
+                                    onClick={() => updateStatus(c.id, status, c.cluster_id)}
                                     disabled={isActive}
                                     style={{
                                       flex: 1, padding: '9px', borderRadius: 7, fontSize: 12, fontWeight: 600,
