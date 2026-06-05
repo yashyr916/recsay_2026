@@ -43,7 +43,7 @@ export default function RecruiterDashboard() {
         <div style={{ display:'flex', alignItems:'center', gap:32 }}>
           <a href="/" style={{ display:'flex', alignItems:'center', gap:8, textDecoration:'none' }}>
             <img src="/RecSaySymbol.png" alt="RecSay" style={{ width:28, height:28, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
-            <span style={{ fontFamily:"'Syne',sans-serif", fontSize:18, fontWeight:800, color:'white' }}>RecSay</span>
+            <span style={{ fontFamily:"'Cabinet Grotesk',sans-serif", fontSize:18, fontWeight:800, color:'white', letterSpacing:'-0.5px' }}>RecSay</span>
           </a>
           <div style={{ display:'flex', gap:4 }}>
             {[['Dashboard','/recruiter/dashboard'],['Clusters','/recruiter']].map(([l,h]) => (
