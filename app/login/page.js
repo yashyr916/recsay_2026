@@ -63,20 +63,20 @@ export default function Login() {
             <label style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.5)', display:'block', marginBottom:8, letterSpacing:'0.06em', textTransform:'uppercase' }}>Password</label>
             <input className="inp" type="password" value={password} onChange={e=>setPassword(e.target.value)} placeholder="••••••••" required />
           </div>
-          <button className="btn" type="submit" disabled={loading} style={{ marginTop:8 }}>
+          <button className="auth-btn" type="submit" disabled={loading} style={{ marginTop:8 }}>
             {loading ? 'Signing in...' : 'Sign In →'}
           </button>
         </form>
 
-        <div style={{ marginTop:24, textAlign:'center' }}>
-          <p style={{ fontSize:14, color:'rgba(255,255,255,0.35)' }}>
-            No account?{' '}
-            <a href="/register" style={{ color:'#7B2FFF', fontWeight:600, textDecoration:'none' }}>Create one free</a>
-            <p style={{ fontSize:14, color:'rgba(255,255,255,0.35)', marginTop:12 }}>
-            <a href="/forgot-password" style={{ color:'rgba(255,255,255,0.4)', textDecoration:'none' }}>Forgot password?</a>
-          </p>
-          </p>
-        </div>
+          <div style={{ marginTop:24, textAlign:'center' }}>
+            <p style={{ fontSize:14, color:'rgba(255,255,255,0.35)' }}>
+              No account?{' '}
+              <a href="/register" style={{ color:'#7B2FFF', fontWeight:600, textDecoration:'none' }}>Create one free</a>
+            </p>
+            <div style={{ fontSize:14, color:'rgba(255,255,255,0.35)', marginTop:12 }}>
+              <a href="/forgot-password" style={{ color:'rgba(255,255,255,0.4)', textDecoration:'none' }}>Forgot password?</a>
+            </div>
+          </div>
 
         <div style={{ marginTop:48, paddingTop:24, borderTop:'1px solid rgba(255,255,255,0.06)', textAlign:'center' }}>
           <a href="/" style={{ fontSize:13, color:'rgba(255,255,255,0.25)', textDecoration:'none' }}>← Back to recsay.com</a>
